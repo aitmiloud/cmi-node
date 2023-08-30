@@ -6,6 +6,7 @@ export default class cmiParams extends BaseCmiClient {
      * GENERATE HASH
      */
     this.generateHash();
+
     /**
      * HANDLE REQUIRE OPTIONS HIDDEN INPUTS AND REDIRECT TO CMI PAGE
      */
@@ -21,7 +22,7 @@ export default class cmiParams extends BaseCmiClient {
     html += "<body onload='closethisasap();'>";
     html += "<form name='redirectpost' method='post' action='" + url + "'>";
 
-    for (const [name, value] of Object.entries(this.requiredOpts)) {
+    for (const [name, value] of Object.entries(this.getRequireOpts())) {
       html += "<input type='hidden' name='" + name + "' value='" + value + "'> ";
     }
 

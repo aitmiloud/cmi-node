@@ -39,11 +39,11 @@ export default class BaseCmiClient implements CmiClientinterface {
       throw new Error('requiredOpts is required');
     }
 
-    // MERGE REQUIRE OPTIONS WITH DEFAULT OPTIONS
-    this.requiredOpts = { ...requiredOpts, ...this.getDefaultOpts() };
+    // MERGE DEFAULT OPTIONS WITH REQUIRED OPTIONS AND ASSIGN IT TO REQUIRED OPTIONS
+    requiredOpts = { ...this.getDefaultOpts(), ...requiredOpts };
 
-    // VALIDATE REQUIRE OTPIONS
-    this.validateOptions(this.requiredOpts);
+    // VALIDATE REQUIRED OPTIONS
+    this.validateOptions(requiredOpts);
 
     // ASSIGN
     this.requiredOpts = requiredOpts;
@@ -56,10 +56,10 @@ export default class BaseCmiClient implements CmiClientinterface {
   getDefaultOpts(): CmiOptions {
     return {
       storetype: '3D_PAY_HOSTING',
-      trantype: 'PreAuth',
+      TranType: 'PreAuth',
       currency: '504', // 504 is MAD
-      rnd: Date.now().toString(),
-      lang: 'fr',
+      rnd: '0.12564400 1669294756',
+      lang: 'en',
       hashAlgorithm: 'ver3',
       encoding: 'UTF-8', // Optional
       refreshtime: '5', // Optional
@@ -83,12 +83,12 @@ export default class BaseCmiClient implements CmiClientinterface {
     /**
      * ASSIGNE STORE KEY
      */
-    if (storekey == null || storekey == undefined) {
+    if (storekey == null || storekey == undefined || storekey == '') {
       storekey = this.requiredOpts.storekey;
     }
 
     // EXCLUDE STOREKEY FROM REQUIRE OPTIONS
-    //this.requiredOpts.storekey = undefined;
+    delete this.requiredOpts.storekey;
 
     const cmiParams = this.requiredOpts;
     // sort the required options by key alphabetically like natcasesort in php
@@ -103,17 +103,17 @@ export default class BaseCmiClient implements CmiClientinterface {
 
     let hashval = '';
     for (const key in sortedCmiParams) {
-      if (key != 'hash' && key != 'encoding') {
+      if (key != 'HASH' && key != 'encoding') {
         hashval += sortedCmiParams[key as T] + '|';
       }
     }
-    const escapedStoreKey = storekey?.replace(/([|])/g, '\\$1');
-    hashval += escapedStoreKey;
+
+    hashval += storekey;
 
     const hash = crypto.createHash('sha512').update(hashval).digest('hex');
     // convert it to base64
     const calculatedHash = Buffer.from(hash, 'hex').toString('base64');
-    this.requiredOpts.Hash = calculatedHash;
+    this.requiredOpts.HASH = calculatedHash;
     return calculatedHash;
   }
 
@@ -162,16 +162,16 @@ export default class BaseCmiClient implements CmiClientinterface {
       }
 
       // VALIDATE trantype SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.trantype) {
+      if (!opts.TranType) {
         throw new Error('trantype is required');
       }
-      if (typeof opts.trantype !== 'string' && opts.trantype !== null) {
+      if (typeof opts.TranType !== 'string' && opts.TranType !== null) {
         throw new Error('trantype must be a string or null');
       }
-      if (opts.trantype === '') {
+      if (opts.TranType === '') {
         throw new Error("trantype can't be empty");
       }
-      if (opts.trantype && /\s/.test(opts.trantype)) {
+      if (opts.TranType && /\s/.test(opts.TranType)) {
         throw new Error("trantype can't contain whitespace");
       }
 
@@ -308,16 +308,16 @@ export default class BaseCmiClient implements CmiClientinterface {
       }
 
       // VALIDATE CALLBACKURL SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY AND SHOULD BE A VALID URL USING THIS REGIX "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i"
-      if (!opts.callbackUrl) {
+      if (!opts.callbackURL) {
         throw new Error('callbackUrl is required');
       }
-      if (typeof opts.callbackUrl !== 'string' && opts.callbackUrl !== null) {
+      if (typeof opts.callbackURL !== 'string' && opts.callbackURL !== null) {
         throw new Error('callbackUrl must be a string or null');
       }
-      if (opts.callbackUrl === '') {
+      if (opts.callbackURL === '') {
         throw new Error("callbackUrl can't be empty");
       }
-      if (opts.callbackUrl && /\s/.test(opts.callbackUrl)) {
+      if (opts.callbackURL && /\s/.test(opts.callbackURL)) {
         throw new Error("callbackUrl can't contain whitespace");
       }
     } catch (error: any) {

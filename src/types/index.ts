@@ -5,7 +5,7 @@ export interface CmiOptions {
   failUrl?: string;
   shopurl?: string;
   storetype?: string;
-  trantype?: string;
+  TranType?: string;
   currency?: string;
   rnd?: string;
   amount?: string;
@@ -13,11 +13,11 @@ export interface CmiOptions {
   hashAlgorithm?: string;
   encoding?: string;
   refreshtime?: string;
-  callbackUrl?: string;
+  callbackURL?: string;
   oid?: string;
   email?: string;
   BillToName?: string;
-  Hash?: string;
+  HASH?: string;
 }
 
 // export interface CmiHashParams {}

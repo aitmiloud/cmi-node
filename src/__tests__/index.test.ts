@@ -1,17 +1,17 @@
 import CmiClient from '../index';
 
 const validOptions = {
-  storekey: 'Fiamane_store_key23',
-  clientid: '600003445',
+  storekey: 'Atzapps_store_key23',
+  clientid: '60000999',
   oid: '135ABC',
   shopurl: 'https://google.com',
   okUrl: 'https://google.com',
   failUrl: 'https://google.com',
   email: 'test@gmail.com',
   BillToName: 'test',
-  BillToCompany: 'test',
   amount: '100',
-  callbackUrl: 'https://google.com',
+  callbackURL: 'https://google.com',
+  tel: '212652124874',
 };
 
 describe('Creating new CmiClient class instance', () => {
@@ -92,7 +92,7 @@ describe('Testing invalid options', () => {
     expect(() => new CmiClient(invalidAmount)).toThrow('amount is required');
   });
 
-  const invalidCallbackUrl = { ...validOptions, callbackUrl: '' };
+  const invalidCallbackUrl = { ...validOptions, callbackURL: '' };
 
   test('should throw an error if CallbackURL is not provided', () => {
     expect(() => new CmiClient(invalidCallbackUrl)).toThrow('callbackUrl is required');
