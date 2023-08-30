@@ -1,8 +1,8 @@
 import CmiClient from '../index';
 
 const validOptions = {
-  storekey: 'atzapps_store_key23',
-  clientid: '600009999',
+  storekey: 'Fiamane_store_key23',
+  clientid: '600003445',
   oid: '135ABC',
   shopurl: 'https://google.com',
   okUrl: 'https://google.com',
@@ -97,5 +97,12 @@ describe('Testing invalid options', () => {
   test('should throw an error if CallbackURL is not provided', () => {
     expect(() => new CmiClient(invalidCallbackUrl)).toThrow('callbackUrl is required');
   });
+});
 
+describe('Testing if CmiClient class methods return html form', () => {
+  const cmiClient = new CmiClient(validOptions);
+
+  test('should return a html form', () => {
+    expect(typeof cmiClient.redirect_post()).toBe('string');
+  });
 });

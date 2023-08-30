@@ -17,7 +17,7 @@ export interface CmiOptions {
   oid?: string;
   email?: string;
   BillToName?: string;
-  HASH?: string;
+  Hash?: string;
 }
 
 // export interface CmiHashParams {}
