@@ -1,3 +1,3 @@
-import {CmiClient} from './classes/CmiClient';
+import { CmiClient } from './classes/CmiClient';
 
 export default CmiClient;

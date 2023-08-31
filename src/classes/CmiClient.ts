@@ -33,8 +33,6 @@ export class CmiClient extends BaseCmiClient {
     html += '</script>';
     html += '</body></html>';
 
-    console.log(html);
-
     return html;
   }
 
