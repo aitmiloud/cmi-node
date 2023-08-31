@@ -1,6 +1,6 @@
 {
-  "name": "@aitmiloud/cmi-payment-nodejs",
-  "version": "1.0.0",
+  "name": "cmi-payment-nodejs",
+  "version": "1.0.1",
   "description": "npm package to communicate with the CMI payment plateform in Morocco",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

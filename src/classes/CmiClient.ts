@@ -1,6 +1,6 @@
 import BaseCmiClient from './BaseCmiClient';
 
-export default class cmiParams extends BaseCmiClient {
+export class CmiClient extends BaseCmiClient {
   public redirect_post(): string {
     /**
      * GENERATE HASH
