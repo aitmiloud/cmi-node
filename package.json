@@ -20,9 +20,6 @@
     "type": "git",
     "url": "git+https://github.com/aitmiloud/cmi-node"
   },
-  "publishConfig": {
-    "access": "public"
-  },
   "keywords": [
         "cmi",
         "cmi nodejs package",
