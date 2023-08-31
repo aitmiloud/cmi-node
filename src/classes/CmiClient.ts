@@ -9,6 +9,7 @@ export default class cmiParams extends BaseCmiClient {
 
     /**
      * HANDLE REQUIRE OPTIONS HIDDEN INPUTS AND REDIRECT TO CMI PAGE
+     * CREATE INPUTS HIDDEN, GENERATE A VALID HASH AND MAKE REDIRECT POST TO CMI
      */
     const url = this.DEFAULT_API_BASE_URL + '/fim/est3Dgate';
 
