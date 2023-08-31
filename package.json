@@ -4,6 +4,9 @@
   "description": "npm package to communicate with the CMI payment plateform in Morocco",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "scripts": {
     "build": "tsc",
     "format": "prettier --write \"src/**/*.(js|ts)\"",
