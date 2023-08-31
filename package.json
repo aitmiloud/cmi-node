@@ -1,6 +1,6 @@
 {
   "name": "cmi-payment-nodejs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "npm package to communicate with the CMI payment plateform in Morocco",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -21,7 +21,7 @@
     "url": "git+https://github.com/aitmiloud/cmi-node"
   },
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
+    "access": "public"
   },
   "keywords": [
         "cmi",
