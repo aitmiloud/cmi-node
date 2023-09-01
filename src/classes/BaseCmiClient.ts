@@ -1,17 +1,17 @@
 import crypto from 'node:crypto';
 import { CmiClientinterface } from '../interfaces/CmiClientInterface';
-import { CmiOptions } from '../types';
+import { CmiOptions, ValidationRule } from '../types';
 
 export default class BaseCmiClient implements CmiClientinterface {
   /**
    * string default base url for CMI's API
    */
-  DEFAULT_API_BASE_URL = 'https://testpayment.cmi.co.ma';
+  readonly DEFAULT_API_BASE_URL = 'https://testpayment.cmi.co.ma';
 
   /**
    * array of languages supported by CMI
    */
-  LANGUAGES = ['ar', 'fr', 'en'];
+  readonly LANGUAGES = ['ar', 'fr', 'en'];
 
   /**
    * array of required options for CMI
@@ -58,8 +58,8 @@ export default class BaseCmiClient implements CmiClientinterface {
       storetype: '3D_PAY_HOSTING',
       TranType: 'PreAuth',
       currency: '504', // 504 is MAD
-      rnd: '0.12564400 1669294756',
-      lang: 'en',
+      rnd: Date.now().toString(),
+      lang: 'fr',
       hashAlgorithm: 'ver3',
       encoding: 'UTF-8', // Optional
       refreshtime: '5', // Optional
@@ -118,210 +118,76 @@ export default class BaseCmiClient implements CmiClientinterface {
   }
 
   private validateOptions(opts: CmiOptions): void {
-    try {
-      // VALIDATE STOREKEY SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.storekey) {
-        throw Error('storekey is required');
-      }
-      if (typeof opts.storekey !== 'string' && opts.storekey !== null) {
-        throw new Error('storekey must be a string or null');
-      }
-      if (opts.storekey === '') {
-        throw new Error("storekey can't be empty");
-      }
-      if (opts.storekey && /\s/.test(opts.storekey)) {
-        throw new Error("storekey can't contain whitespace");
+    const validationRules: ValidationRule[] = [
+      { field: 'storekey', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'clientid', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'storetype', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'TranType', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'amount', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'currency', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'oid', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'okUrl', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true, isURL: true },
+      { field: 'failUrl', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true, isURL: true },
+      {
+        field: 'lang',
+        required: true,
+        type: 'stringOrNull',
+        allowEmpty: false,
+        noWhitespace: true,
+        validLang: ['ar', 'fr', 'en'],
+      },
+      { field: 'email', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true, isEmail: true },
+      { field: 'BillToName', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      {
+        field: 'hashAlgorithm',
+        required: true,
+        type: 'stringOrNull',
+        allowEmpty: false,
+        noWhitespace: true,
+        validHashAlgorithm: ['SHA1', 'SHA256', 'SHA512'],
+      },
+      {
+        field: 'callbackURL',
+        required: true,
+        type: 'stringOrNull',
+        allowEmpty: false,
+        noWhitespace: true,
+        isURL: true,
+      },
+    ];
+
+    for (const rule of validationRules) {
+      const value = opts[rule.field];
+
+      if (rule.required && (value === undefined || value === null)) {
+        throw new Error(`${rule.field} is required`);
       }
 
-      // VALIDATE CLIENTID SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.clientid) {
-        throw new Error('clientid is required');
-      }
-      if (typeof opts.clientid !== 'string' && opts.clientid !== null) {
-        throw new Error('clientid must be a string or null');
-      }
-      if (opts.clientid === '') {
-        throw new Error("clientid can't be empty");
-      }
-      if (opts.clientid && /\s/.test(opts.clientid)) {
-        throw new Error("clientid can't contain whitespace");
-      }
+      if (value !== null) {
+        if (rule.type === 'stringOrNull' && typeof value !== 'string' && value !== null) {
+          throw new Error(`${rule.field} must be a string or null`);
+        }
 
-      // VALIDATE STORETYPE SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.storetype) {
-        throw new Error('storetype is required');
-      }
-      if (typeof opts.storetype !== 'string' && opts.storetype !== null) {
-        throw new Error('storetype must be a string or null');
-      }
-      if (opts.storetype === '') {
-        throw new Error("storetype can't be empty");
-      }
-      if (opts.storetype && /\s/.test(opts.storetype)) {
-        throw new Error("storetype can't contain whitespace");
-      }
+        if (rule.isURL && typeof value === 'string' && !/^https?:\/\/.+/.test(value)) {
+          throw new Error(`${rule.field} must be a valid URL`);
+        }
 
-      // VALIDATE trantype SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.TranType) {
-        throw new Error('trantype is required');
-      }
-      if (typeof opts.TranType !== 'string' && opts.TranType !== null) {
-        throw new Error('trantype must be a string or null');
-      }
-      if (opts.TranType === '') {
-        throw new Error("trantype can't be empty");
-      }
-      if (opts.TranType && /\s/.test(opts.TranType)) {
-        throw new Error("trantype can't contain whitespace");
-      }
+        if (rule.isEmail && typeof value === 'string' && !/^.+@.+\..+$/.test(value)) {
+          throw new Error(`${rule.field} must be a valid email`);
+        }
 
-      // VALIDATE AMOUNT SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.amount) {
-        throw new Error('amount is required');
-      }
-      if (typeof opts.amount !== 'string' && opts.amount !== null) {
-        throw new Error('amount must be a string or null');
-      }
-      if (opts.amount === '') {
-        throw new Error("amount can't be empty");
-      }
-      if (opts.amount && /\s/.test(opts.amount)) {
-        throw new Error("amount can't contain whitespace");
-      }
+        if (rule.validLang && typeof value === 'string' && !rule.validLang.includes(value)) {
+          throw new Error(`${rule.field} must be one of these languages: ${rule.validLang.join(', ')}`);
+        }
 
-      // VALIDATE currency SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.currency) {
-        throw new Error('currency is required');
-      }
-      if (typeof opts.currency !== 'string' && opts.currency !== null) {
-        throw new Error('currency must be a string or null');
-      }
-      if (opts.currency === '') {
-        throw new Error("currency can't be empty");
-      }
-      if (opts.currency && /\s/.test(opts.currency)) {
-        throw new Error("currency can't contain whitespace");
-      }
+        if (!rule.allowEmpty && (value === '' || (typeof value === 'string' && /^\s*$/.test(value)))) {
+          throw new Error(`${rule.field} can't be empty`);
+        }
 
-      // VALIDATE OID SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.oid) {
-        throw new Error('oid is required');
+        if (rule.noWhitespace && typeof value === 'string' && /\s/.test(value)) {
+          throw new Error(`${rule.field} can't contain whitespace`);
+        }
       }
-      if (typeof opts.oid !== 'string' && opts.oid !== null) {
-        throw new Error('oid must be a string or null');
-      }
-      if (opts.oid === '') {
-        throw new Error("oid can't be empty");
-      }
-      if (opts.oid && /\s/.test(opts.oid)) {
-        throw new Error("oid can't contain whitespace");
-      }
-
-      // VALIDATE okUrl SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY AND SHOULD BE A VALID URL USING THIS REGIX "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i"
-      if (!opts.okUrl) {
-        throw new Error('okUrl is required');
-      }
-      if (typeof opts.okUrl !== 'string' && opts.okUrl !== null) {
-        throw new Error('okUrl must be a string or null');
-      }
-      if (opts.okUrl === '') {
-        throw new Error("okUrl can't be empty");
-      }
-      if (opts.okUrl && /\s/.test(opts.okUrl)) {
-        throw new Error("okUrl can't contain whitespace");
-      }
-
-      // VALIDATE failUrl SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY AND SHOULD BE A VALID URL USING THIS REGIX "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i"
-      if (!opts.failUrl) {
-        throw new Error('failUrl is required');
-      }
-      if (typeof opts.failUrl !== 'string' && opts.failUrl !== null) {
-        throw new Error('failUrl must be a string or null');
-      }
-      if (opts.failUrl === '') {
-        throw new Error("failUrl can't be empty");
-      }
-      if (opts.failUrl && /\s/.test(opts.failUrl)) {
-        throw new Error("failUrl can't contain whitespace");
-      }
-
-      // VALIDATE LANG SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY AND SHOULD BE ONE OF THIS LANGUAGES "ar", "fr", "en"
-      if (!opts.lang) {
-        throw new Error('lang is required');
-      }
-      if (typeof opts.lang !== 'string' && opts.lang !== null) {
-        throw new Error('lang must be a string or null');
-      }
-      if (opts.lang === '') {
-        throw new Error("lang can't be empty");
-      }
-      if (opts.lang && /\s/.test(opts.lang)) {
-        throw new Error("lang can't contain whitespace");
-      }
-      if (opts.lang && !this.LANGUAGES.includes(opts.lang)) {
-        throw new Error('lang must be one of this languages "ar", "fr", "en"');
-      }
-
-      // VALIDATE EMAIL SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY AND SHOULD BE A VALID EMAIL USING THIS REGIX "/^[^\s@]+@[^\s@]+\.[^\s@]+$/"
-      if (!opts.email) {
-        throw new Error('email is required');
-      }
-      if (typeof opts.email !== 'string' && opts.email !== null) {
-        throw new Error('email must be a string or null');
-      }
-      if (opts.email === '') {
-        throw new Error("email can't be empty");
-      }
-      if (opts.email && /\s/.test(opts.email)) {
-        throw new Error("email can't contain whitespace");
-      }
-      if (opts.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(opts.email)) {
-        throw new Error('email must be a valid email');
-      }
-
-      // VALIDATE BillToName SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY
-      if (!opts.BillToName) {
-        throw new Error('BillToName is required');
-      }
-      if (typeof opts.BillToName !== 'string' && opts.BillToName !== null) {
-        throw new Error('BillToName must be a string or null');
-      }
-      if (opts.BillToName === '') {
-        throw new Error("BillToName can't be empty");
-      }
-      if (opts.BillToName && /\s/.test(opts.BillToName)) {
-        throw new Error("BillToName can't contain whitespace");
-      }
-
-      // VALIDATE HASHALGORITHM SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY AND SHOULD BE ONE OF THIS HASHALGORITHM "SHA1", "SHA256", "SHA512"
-      if (!opts.hashAlgorithm) {
-        throw new Error('hashAlgorithm is required');
-      }
-      if (typeof opts.hashAlgorithm !== 'string' && opts.hashAlgorithm !== null) {
-        throw new Error('hashAlgorithm must be a string or null');
-      }
-      if (opts.hashAlgorithm === '') {
-        throw new Error("hashAlgorithm can't be empty");
-      }
-      if (opts.hashAlgorithm && /\s/.test(opts.hashAlgorithm)) {
-        throw new Error("hashAlgorithm can't contain whitespace");
-      }
-
-      // VALIDATE CALLBACKURL SHOULD BE A STRING OR NULL, CAN'T BE EMPTY STRING, CAN'T CONTAIN WHITESPACE, CAN'T BE AN OBJECT OR ARRAY AND SHOULD BE A VALID URL USING THIS REGIX "/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i"
-      if (!opts.callbackURL) {
-        throw new Error('callbackUrl is required');
-      }
-      if (typeof opts.callbackURL !== 'string' && opts.callbackURL !== null) {
-        throw new Error('callbackUrl must be a string or null');
-      }
-      if (opts.callbackURL === '') {
-        throw new Error("callbackUrl can't be empty");
-      }
-      if (opts.callbackURL && /\s/.test(opts.callbackURL)) {
-        throw new Error("callbackUrl can't contain whitespace");
-      }
-    } catch (error: any) {
-      throw new Error(error.message);
     }
   }
 }

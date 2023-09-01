@@ -9,100 +9,70 @@ const validOptions = {
   failUrl: 'https://google.com',
   email: 'test@gmail.com',
   BillToName: 'test',
-  amount: '100',
+  amount: '7896',
   callbackURL: 'https://google.com',
   tel: '212652124874',
 };
 
-describe('Creating new CmiClient class instance', () => {
-  const cmiClient = new CmiClient(validOptions);
+describe('CmiClient', () => {
+  let cmiClient: CmiClient;
 
-  test('should return a new instance of CmiClient', () => {
+  beforeEach(() => {
+    cmiClient = new CmiClient(validOptions);
+  });
+
+  test('creates a new instance of CmiClient', () => {
     expect(cmiClient).toBeInstanceOf(CmiClient);
   });
 
-  test('should return a hash string', () => {
-    expect(typeof cmiClient.generateHash(validOptions.storekey)).toBe('string');
-  });
-});
-
-describe('Testing CmiClient class methods', () => {
-  const cmiClient = new CmiClient(validOptions);
-
-  test('should return a default options object', () => {
-    expect(cmiClient.getDefaultOpts()).toBeInstanceOf(Object);
+  test('generates a hash string', () => {
+    const hash = cmiClient.generateHash(validOptions.storekey);
+    expect(typeof hash).toBe('string');
   });
 
-  test('should return a hash string', () => {
-    expect(typeof cmiClient.generateHash(validOptions.storekey)).toBe('string');
+  test('returns default options object', () => {
+    const defaultOpts = cmiClient.getDefaultOpts();
+    expect(defaultOpts).toBeInstanceOf(Object);
   });
 
-  test('should return a require options object', () => {
-    expect(cmiClient.getRequireOpts()).toBeInstanceOf(Object);
-  });
-});
-
-describe('Testing invalid options', () => {
-  const invalidStoreKey = { ...validOptions, storekey: '' };
-
-  test('should throw an error if storekey is not provided', () => {
-    //const cmiClient = new CmiClient(invalidStoreKey);
-    expect(() => new CmiClient(invalidStoreKey)).toThrow('storekey is required');
+  test('returns required options object', () => {
+    const requiredOpts = cmiClient.getRequireOpts();
+    expect(requiredOpts).toBeInstanceOf(Object);
   });
 
-  const invalidClientId = { ...validOptions, clientid: '' };
+  describe('invalid options', () => {
+    const invalidCases = [
+      { key: 'storekey', message: 'storekey is required' },
+      { key: 'clientid', message: 'clientid is required' },
+      { key: 'oid', message: 'oid is required' },
+      { key: 'okUrl', message: 'okUrl is required' },
+      { key: 'failUrl', message: 'failUrl is required' },
+      { key: 'email', message: 'email is required' },
+      { key: 'BillToName', message: 'BillToName is required' },
+      { key: 'amount', message: 'amount is required' },
+      { key: 'callbackURL', message: 'callbackURL is required' },
+    ];
 
-  test('should throw an error if clientid is not provided', () => {
-    expect(() => new CmiClient(invalidClientId)).toThrow('clientid is required');
+    invalidCases.forEach(({ key, message }) => {
+      test(`throws an error if ${key} is not provided`, () => {
+        const invalidOptions = { ...validOptions, [key]: null };
+        expect(() => new CmiClient(invalidOptions)).toThrow(message);
+      });
+    });
+
+    test('throws an error if email is not a valid email', () => {
+      const invalidOptions = { ...validOptions, email: 'invalid_email' };
+      expect(() => new CmiClient(invalidOptions)).toThrow('email must be a valid email');
+    });
+
+    test('throws an error if lang is not one of "ar", "fr", "en"', () => {
+      const invalidOptions = { ...validOptions, lang: 'es' };
+      expect(() => new CmiClient(invalidOptions)).toThrow('lang must be one of these languages: ar, fr, en');
+    });
   });
 
-  const invalidOid = { ...validOptions, oid: '' };
-
-  test('should throw an error if oid is not provided', () => {
-    expect(() => new CmiClient(invalidOid)).toThrow('oid is required');
-  });
-
-  const invalidOkUrl = { ...validOptions, okUrl: '' };
-
-  test('should throw an error if okUrl is not provided', () => {
-    expect(() => new CmiClient(invalidOkUrl)).toThrow('okUrl is required');
-  });
-
-  const invalidFailUrl = { ...validOptions, failUrl: '' };
-
-  test('should throw an error if failUrl is not provided', () => {
-    expect(() => new CmiClient(invalidFailUrl)).toThrow('failUrl is required');
-  });
-
-  const invalidEmail = { ...validOptions, email: '' };
-
-  test('should throw an error if email is not provided', () => {
-    expect(() => new CmiClient(invalidEmail)).toThrow('email is required');
-  });
-
-  const invalidBillToName = { ...validOptions, BillToName: '' };
-
-  test('should throw an error if BillToName is not provided', () => {
-    expect(() => new CmiClient(invalidBillToName)).toThrow('BillToName is required');
-  });
-
-  const invalidAmount = { ...validOptions, amount: '' };
-
-  test('should throw an error if amount is not provided', () => {
-    expect(() => new CmiClient(invalidAmount)).toThrow('amount is required');
-  });
-
-  const invalidCallbackUrl = { ...validOptions, callbackURL: '' };
-
-  test('should throw an error if CallbackURL is not provided', () => {
-    expect(() => new CmiClient(invalidCallbackUrl)).toThrow('callbackUrl is required');
-  });
-});
-
-describe('Testing if CmiClient class methods return html form', () => {
-  const cmiClient = new CmiClient(validOptions);
-
-  test('should return a html form', () => {
-    expect(typeof cmiClient.redirect_post()).toBe('string');
+  test('returns an HTML form string', () => {
+    const form = cmiClient.redirect_post();
+    expect(typeof form).toBe('string');
   });
 });

@@ -32,7 +32,6 @@ export class CmiClient extends BaseCmiClient {
     html += "function closethisasap() { document.forms['redirectpost'].submit(); }";
     html += '</script>';
     html += '</body></html>';
-
     return html;
   }
 

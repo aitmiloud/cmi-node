@@ -20,6 +20,18 @@ export interface CmiOptions {
   HASH?: string;
 }
 
+export type ValidationRule = {
+  field: keyof CmiOptions;
+  required: boolean;
+  type: 'stringOrNull' | 'isURL' | 'validLang' | 'isEmail' | 'validHashAlgorithm';
+  allowEmpty: boolean;
+  noWhitespace: boolean;
+  validLang?: string[];
+  validHashAlgorithm?: string[];
+  isURL?: boolean;
+  isEmail?: boolean;
+};
+
 // export interface CmiHashParams {}
 
 // export interface CmiGenerateLinkOptions {}
