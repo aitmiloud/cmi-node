@@ -9,14 +9,14 @@
     <a href="https://github.com/aitmiloud/cmi-node/pulls">
       <img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/aitmiloud/cmi-node?style=flat&color=336791" />
     </a>
-     <a href="https://github.com/aitmiloud/cmi-node">
-      <img alt="GitHub Downloads" src="https://img.shields.io/npm/dw/cmi-node?style=flat&color=336791" />
-    </a>
     <a href="https://github.com/aitmiloud/cmi-node">
-      <img alt="GitHub Total Downloads" src="https://img.shields.io/npm/dt/cmi-node?color=336791&label=Total%20downloads" />
+      <img alt="Npm Total Downloads" src="https://img.shields.io/npm/dt/cmi-payment-nodejs" />
     </a>
  <a href="https://github.com/aitmiloud/cmi-node">
       <img alt="GitHub release" src="https://img.shields.io/github/release/aitmiloud/cmi-node.svg?style=flat&color=336791" />
+    </a>
+     <a href="https://github.com/aitmiloud/cmi-node">
+      <img alt="GitHub Downloads" src="https://img.shields.io/npm/l/cmi-payment-nodejs" />
     </a>
     <br />
     <br />
