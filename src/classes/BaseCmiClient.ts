@@ -137,7 +137,7 @@ export default class BaseCmiClient implements CmiClientinterface {
         validLang: ['ar', 'fr', 'en'],
       },
       { field: 'email', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true, isEmail: true },
-      { field: 'BillToName', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: true },
+      { field: 'BillToName', required: true, type: 'stringOrNull', allowEmpty: false, noWhitespace: false },
       {
         field: 'hashAlgorithm',
         required: true,
