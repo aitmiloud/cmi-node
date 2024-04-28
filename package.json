@@ -1,11 +1,11 @@
 {
   "name": "cmi-payment-nodejs",
-  "version": "1.1.3",
+  "version": "1.1.4",
   "description": "npm package to communicate with the CMI payment plateform in Morocco",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "engines": {
-    "node": ">=8.0.0 <20.0.0"
+    "node": ">=8.0.0 <22.0.0"
   },
   "scripts": {
     "build": "tsc",
